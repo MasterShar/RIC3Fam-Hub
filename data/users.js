@@ -74,7 +74,6 @@ export function formatAndValidateUser(userData, ignorePassword) {
     // Checks to make sure skills are valid and converts them to boolean
     if (userData.skills) {
         for (const [key, value] of Object.entries(userData.skills)) {
-            //console.log(key, value);
             if (typeof value !== 'string' && typeof value !== 'object') throw `Skill '${key}, ${value}' is not valid`;
             if (value.type === 'checkbox') {
                 if (value.value !== undefined && !['true', 'false'].includes(value.value.toString())) throw `Skill '${key}, ${value}' is not valid`;
@@ -180,7 +179,7 @@ const editUser = async (userId, username, emailAddress, profilePicture, descript
         username: { $regex: new RegExp(`^${username}$`, 'i') },
     });
 
-    if (similarUser._id != userId) {
+    if (similarUser && similarUser._id.toString() !== userId) {
         throw 'Username or Email address already taken';
     }
 
@@ -323,7 +322,7 @@ export const loginUser = async (username, password) => {
     username = username.trim().toLowerCase();
     password = password.trim();
     if (username.length === 0 || password.length === 0) throw 'Cannot be empty spaces';
-    //helpers.validatePassword(password);
+    helpers.validatePassword(password);
 
     const userCollection = await users();
     const user = await userCollection.findOne({ username: { $regex: new RegExp(`^${username}$`, 'i') } });

@@ -6,7 +6,6 @@ if (createGameForm) {
     let messageLabel = document.getElementById('message-label');
     errorLabel.hidden = true;
     createGameForm.addEventListener('submit', (event) => {
-        //console.log('Form submission triggered');
         event.preventDefault();
         try {
             let gameName = document.getElementById('game-name');
@@ -71,16 +70,12 @@ function validateGame(gameName, gameDescription, gameLocation, maxCapacity, game
     gameDate = gameDate.trim();
     startTime = startTime.trim();
     endTime = endTime.trim();
-    //console.log(gameDate, startTime, endTime);
-    //startTime = convertTo12Hour(startTime);
-    //endTime = convertTo12Hour(endTime);
-    //console.log(gameDate, startTime, endTime);
     if (gameName.length === 0 || gameDescription.length === 0 || gameDate.length === 0 || startTime.length === 0 || endTime.length === 0)
         throw 'One or more string fields empty';
 
     if (gameName.length < 5) throw 'Event name less than 5 chars';
     if (!isValidDay(gameDate)) throw 'Event Date is not valid';
-    if (isDateInFuture(gameDate)) throw 'Event Date has to be in the future';
+    if (isDateInPast(gameDate)) throw 'Event date must be in the future';
     if (!isValidTime(startTime) || !isValidTime(endTime)) throw 'Start and/or end time is not valid';
     if (!compareTimes(startTime, endTime)) throw 'Start time has to be 30min before end time';
 
@@ -125,7 +120,7 @@ function compareDates(day1, day2) {
     return -1;
 }
 
-function isDateInFuture(gameDate) {
+function isDateInPast(gameDate) {
     let currentDate = new Date();
     currentDate = `${currentDate.getMonth() + 1}/${currentDate.getDate()}/${currentDate.getFullYear()}`;
 
@@ -191,7 +186,6 @@ function isValidDay(eventDate) {
 
 function isValidTime(time) {
     return /^(([01][0-9])|(2[0-3])):[0-5][0-9]$/.test(time);
-    //return /^(([1-9])|(1[0-2])):[0-5][0-9] (AM|PM)$/.test(time);
 }
 
 function convertTo12Hour(timeString) {
@@ -203,8 +197,6 @@ function convertTo12Hour(timeString) {
     const twelveHour = hours % 12 || 12;
     return `${twelveHour.toString()}:${minutes.toString().padStart(2, '0')} ${ampm}`;
 }
-
-function editGame() {}
 
 function isValidNum(string) {
     if (!string) {

@@ -11,8 +11,6 @@ router
         try {
             const allEvents = await gamesData.getAll();
             const eventsPageSlideshow = await mediaData.getEventPageSlideshow();
-            //const eventsPage = await gamesData.getGamesPage();
-
             const ret = {
                 title: 'Events',
                 events: allEvents,
@@ -52,10 +50,7 @@ router
                 link = helpers.stringHelper(link, 'Link');
                 linkdesc = helpers.stringHelper(linkdesc, 'Link Description', 1, 300);
             }
-            //startTime = helpers.convertTo12Hour(startTime);
-            //endTime = helpers.convertTo12Hour(endTime);
-            //gameDate = helpers.convertToMMDDYYYY(gameDate);
-            gamesData.formatAndValidateGame(gameName, gameDescription, gameLocation, maxPlayersNumber, gameDate, startTime, endTime, organizer, link, linkdesc);
+            await gamesData.formatAndValidateGame(gameName, gameDescription, gameLocation, maxPlayersNumber, gameDate, startTime, endTime, organizer, link, linkdesc);
 
             const createResult = await gamesData.create(
                 gameName,
@@ -105,18 +100,16 @@ router.route('/:gameId').get(async (req, res) => {
             organizerArr = await usersData.getIDName([gameObj.organizer]);
         }
 
-        //const weather = await weatherData.getWeather(gameObj.gameLocation.zip);
-
-        gameObj.comments.forEach(async (comment) => {
+        await Promise.all(gameObj.comments.map(async (comment) => {
             try {
                 comment.sender = (await usersData.getIDName([comment.userId]))[0];
-                if (req.session.user._id === comment.userId) {
+                if (req.session.user && req.session.user._id === comment.userId) {
                     comment.isSender = true;
                 }
             } catch {
                 comment.isSender = false;
             }
-        });
+        }));
 
         return res.render('game', {
             title: 'Game: ' + gameObj.gameName,
@@ -126,7 +119,6 @@ router.route('/:gameId').get(async (req, res) => {
             hostGroup: hostGroup,
             isOwner: isOwner,
             isMember: isMember,
-            //weather: weather,
         });
     } catch (e) {
         res.status(400).render('error', { title: 'Error', error: e });
@@ -179,12 +171,9 @@ router
 
             if (!helpers.isValidDay(gameDate)) throw 'Event Date is not valid';
 
-            // let startTime = helpers.convertTo12Hour(req.body.startTime);
-            // let endTime = helpers.convertTo12Hour(req.body.endTime);
-            // let gameDate = helpers.convertToMMDDYYYY(req.body.date);
             let gameLocation = { zip: req.body.zip, state: req.body.state, streetAddress: req.body.streetAddress, city: req.body.city };
 
-            gamesData.formatAndValidateGame(
+            await gamesData.formatAndValidateGame(
                 req.body.gameName,
                 req.body.gameDescription,
                 gameLocation,

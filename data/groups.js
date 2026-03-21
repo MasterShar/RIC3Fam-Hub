@@ -223,9 +223,6 @@ const addUser = async (userId, groupId) => {
     if (!group) {
         throw 'Could not find group';
     }
-    if (group.maxCapacity <= group.players.length) {
-        throw 'Game is full';
-    }
     if (group.players.includes(userId)) {
         throw 'User is already in the group.';
     }
@@ -237,7 +234,7 @@ const addUser = async (userId, groupId) => {
     //Update group collection
     const groupCollection = await groups();
     const userCollection = await users();
-    const updateGame = await groupCollection.updateOne(
+    const updateGroup = await groupCollection.updateOne(
         { _id: new ObjectId(groupId) },
         {
             $push: { players: userId },
@@ -246,11 +243,11 @@ const addUser = async (userId, groupId) => {
     );
     const updateUser = await userCollection.updateOne({ _id: new ObjectId(userId) }, { $push: { groups: groupId } });
 
-    if (!updateGame || !updateUser) {
-        throw 'Could not update either game or user';
+    if (!updateGroup || !updateUser) {
+        throw 'Could not update either group or user';
     }
 
-    return { updateGame, updateUser };
+    return { updateGroup, updateUser };
 };
 
 const searchGroups = async (search) => {

@@ -2,7 +2,6 @@ import { Router } from 'express';
 
 import { usersData, gamesData, groupsData } from '../data/index.js';
 import * as helpers from '../helpers.js';
-import groups from '../data/groups.js';
 const router = Router();
 
 router
@@ -40,17 +39,16 @@ router.route('/:groupId').get(async (req, res) => {
         let isMember = currentUser && groupObj.players.includes(currentUser._id);
         let isOwner = currentUser && owner._id == currentUser._id;
 
-        groupObj.comments.forEach(async comment => {
-            try{
-                comment.sender = (await usersData.getIDName([comment.userId]))[0]
-                if (req.session.user._id === comment.userId) {
+        await Promise.all(groupObj.comments.map(async (comment) => {
+            try {
+                comment.sender = (await usersData.getIDName([comment.userId]))[0];
+                if (req.session.user && req.session.user._id === comment.userId) {
                     comment.isSender = true;
                 }
-            }
-            catch{
+            } catch {
                 comment.isSender = false;
             }
-        });
+        }));
         
         return res.render('group', {
             title:"Group: " + groupObj.groupName,

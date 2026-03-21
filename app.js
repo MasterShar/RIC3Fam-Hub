@@ -14,10 +14,9 @@ import configRoutesFunction from './routes/index.js';
 const app = express();
 
 app.use(cookieParser());
-app.use(express.json());
 
 const corsOptions = {
-    origin: true,
+    origin: process.env.CORS_ORIGIN || false,
 };
 
 app.use(cors(corsOptions));
@@ -50,7 +49,7 @@ app.set('view engine', 'handlebars');
 app.use(
     session({
         name: 'CoolSession',
-        secret: 'crazy super secret signing key!',
+        secret: process.env.SESSION_SECRET || 'crazy super secret signing key!',
         saveUninitialized: false,
         resave: false,
         cookie: { maxAge: 60 * 10000 }, // 1 hr

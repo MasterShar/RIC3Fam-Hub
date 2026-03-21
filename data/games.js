@@ -4,17 +4,15 @@ import { usersData, groupsData, picturesData } from './index.js';
 import { ObjectId } from 'mongodb';
 import xss from 'xss';
 
-const formatAndValidateGame = function (gameName, gameDescription, gameLocation, maxCapacity, gameDate, startTime, endTime, organizer = undefined, link, linkdesc) {
+const formatAndValidateGame = async function (gameName, gameDescription, gameLocation, maxCapacity, gameDate, startTime, endTime, organizer = undefined, link, linkdesc) {
     gameName = helpers.stringHelper(gameName, 'Game name', 5, null);
     gameDescription = helpers.stringHelper(gameDescription, 'Game description', 1, null);
     gameDate = helpers.stringHelper(gameDate, 'Game date', 1, null);
     startTime = helpers.stringHelper(startTime, 'Start time', 1, null);
     endTime = helpers.stringHelper(endTime, 'End time', 1, null);
 
-    //if (link != ""){ linkdesc = helpers.stringHelper(linkdesc, 'Link Description', 1, 300); }
-
     if (!helpers.isValidDay(gameDate)) throw 'Event Date is not valid';
-    if (helpers.isDateInFuture(gameDate)) throw 'Event Date has to be in the future';
+    if (helpers.isDateInPast(gameDate)) throw 'Event Date has to be in the future';
     if (!helpers.isValidTime(startTime) || !helpers.isValidTime(endTime)) throw 'Start and/or end time is not valid';
     if (!helpers.compareTimes(startTime, endTime)) throw 'Start time has to be 30min before end time';
 
@@ -25,13 +23,13 @@ const formatAndValidateGame = function (gameName, gameDescription, gameLocation,
     helpers.validateLocation(gameLocation);
 
     helpers.isValidId(organizer);
-    if (!usersData.isUserAdmin(organizer)) throw 'User is not an admin';
+    if (!(await usersData.isUserAdmin(organizer))) throw 'User is not an admin';
 
     return { gameName, gameDescription, gameDate, startTime, endTime, maxCapacity, gameLocation, link, linkdesc };
 };
 
 const create = async (gameName, gameDescription, gameLocation, maxCapacity, gameDate, startTime, endTime, group, organizer, link, linkdesc) => {
-    let gameData = formatAndValidateGame(gameName, gameDescription, gameLocation, maxCapacity, gameDate, startTime, endTime, organizer, link, linkdesc );
+    let gameData = await formatAndValidateGame(gameName, gameDescription, gameLocation, maxCapacity, gameDate, startTime, endTime, organizer, link, linkdesc );
 
     // Group is optional
     if (group !== 'N/A') helpers.isValidId(group);
@@ -74,7 +72,6 @@ const create = async (gameName, gameDescription, gameLocation, maxCapacity, game
     if (!updateUser) {
         throw 'Could not update the organizer';
     }
-    //await closeConnection(); // For testing purposes
     return game;
 };
 
@@ -275,7 +272,7 @@ const update = async (
     link,
     linkdesc
 ) => {
-    let gameData = formatAndValidateGame(gameName, gameDescription, gameLocation, maxCapacity, gameDate, startTime, endTime, userId, link, linkdesc);
+    let gameData = await formatAndValidateGame(gameName, gameDescription, gameLocation, maxCapacity, gameDate, startTime, endTime, userId, link, linkdesc);
 
     const oldGame = await get(gameId); // Check if game exists
 
@@ -333,10 +330,8 @@ const keepStatusUpdated = async () => {
     const gamesList = await getAll();
     const gameCollection = await games();
 
-    //console.log('Checking for expired games');
-
     for (let game of gamesList) {
-        if (helpers.isDateInFuture(game.gameDate)) {
+        if (helpers.isDateInPast(game.gameDate)) {
             try {
                 await gameCollection.updateOne({ _id: new ObjectId(game._id) }, { $set: { expired: true } });
             } catch (err) {

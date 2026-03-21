@@ -186,16 +186,15 @@ export function compareDates(day1, day2) {
     return -1;
 }
 
-export function isDateInFuture(gameDate) {
+export function isDateInPast(gameDate) {
     let currentDate = new Date();
     currentDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`;
 
-    return compareDates(currentDate, gameDate) === 1; // Date is in the future
+    return compareDates(currentDate, gameDate) === 1;
 }
 
 export function isValidTime(time) {
     return /^(([01][0-9])|(2[0-3])):[0-5][0-9]$/.test(time);
-    //return /^(([1-9])|(1[0-2])):[0-5][0-9] (AM|PM)$/.test(time);
 }
 
 export function compareTimes(time1, time2) {
@@ -207,20 +206,14 @@ export function compareTimes(time1, time2) {
     return time1[0] + 30 <= time2[0];
 }
 
-function isValid24(time) {
-    var regex = /^([01][0-9]|2[0-3]):([0-5][0-9])$/;
-    return regex.test(time);
-}
 export function convertTo12Hour(timeString) {
-    //HTML uses 24 hours
-    //Input validation
     if (!timeString) {
         throw 'Could not find string';
     }
     if (typeof timeString !== 'string') {
         throw 'Not of type string';
     }
-    if (!isValid24(timeString)) {
+    if (!isValidTime(timeString)) {
         throw 'Not correct time string';
     }
 
@@ -232,42 +225,6 @@ export function convertTo12Hour(timeString) {
     const twelveHour = hours % 12 || 12;
     return `${twelveHour.toString()}:${minutes.toString().padStart(2, '0')} ${ampm}`;
 }
-export function isValidDayBritainEdition(eventDate) {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(eventDate)) return 0;
-    const date = eventDate.split('-');
-    const month = Number(date[1]);
-    const day = Number(date[2]);
-
-    // Checks if number of days is valid for the month
-    switch (month) {
-        case 1:
-            return day <= 31;
-        case 2:
-            return day <= 28;
-        case 3:
-            return day <= 31;
-        case 4:
-            return day <= 30;
-        case 5:
-            return day <= 31;
-        case 6:
-            return day <= 30;
-        case 7:
-            return day <= 31;
-        case 8:
-            return day <= 31;
-        case 9:
-            return day <= 30;
-        case 10:
-            return day <= 31;
-        case 11:
-            return day <= 30;
-        case 12:
-            return day <= 31;
-        default:
-            return false;
-    }
-}
 
 export function convertToMMDDYYYY(dateString) {
     //HTML form uses different formating for the data so this used to convert back to ours
@@ -278,7 +235,7 @@ export function convertToMMDDYYYY(dateString) {
     if (typeof dateString !== 'string') {
         throw 'Not of type date';
     }
-    if (!isValidDayBritainEdition(dateString)) {
+    if (!isValidDay(dateString)) {
         throw 'Not in correct format';
     }
     const [year, month, day] = dateString.split('-');

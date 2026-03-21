@@ -1,9 +1,7 @@
 import * as helpers from '../helpers.js';
 import axios from 'axios';
-import { weatherData } from './index.js';
-
 const BASE_URL = 'http://api.openweathermap.org/';
-const API_KEY = '620ef0233e71e5d9c383aabbb157a0a7';
+const API_KEY = process.env.OPENWEATHER_API_KEY;
 
 // Gets the latitude and longitude of a given zip code
 const getLatLong = async (zipCode) => {
