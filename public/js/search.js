@@ -46,7 +46,7 @@ function stringsAllCaps (string1, string2) {
             let usersList = data.users;
             let groupsList = data.groups;
             usersList.sort((a, b) => stringsAllCaps(a.username, b.username) || a.username.localeCompare(b.username))
-            groupsList.sort((a, b) => a.groupName.localeCompare(b.groupName));
+            groupsList.sort((a, b) => stringsAllCaps(a.groupName, b.groupName) || a.groupName.localeCompare(b.groupName));
             //let gamesList = data.games;
             //addHeader(usersUL, 'Family Frisbee Members:');
             for (let i = 0; i < usersList.length; i++) {
