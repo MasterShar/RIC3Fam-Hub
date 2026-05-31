@@ -24,12 +24,24 @@ router
 
 router.route('/:groupId').get(async (req, res) => {
     try {
+
+        function stringsAllCaps (string1, string2) {
+   
+            let string1AllCaps = string1 == string1.toUpperCase();
+            let string2AllCaps = string2 == string2.toUpperCase();
+            if (string1AllCaps == string2AllCaps) { return 0 }
+            if (string1AllCaps > string2AllCaps) { return -1 }
+            return 1;
+        }
+
+
         let groupId = req.params.groupId;
         helpers.isValidId(groupId);
         const groupObj = await groupsData.get(groupId);
         let players=  groupObj.players;
         players = players.filter(player => player !== groupObj.groupLeader)
-        const members = await usersData.getIDName(players);
+        let members = await usersData.getIDName(players);
+        members.sort((a, b) => stringsAllCaps(a.name, b.name) || a.name.localeCompare(b.name));
         let games = await gamesData.getAllByGroup(groupId);
         games = games.map(game => ({_id: game._id, name: game.gameName}));
         let owner = null;
