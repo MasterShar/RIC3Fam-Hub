@@ -8,14 +8,16 @@ const router = Router();
 router
     .route('/')
     .post(async (req, res) => {
-        const groupName = req.body.groupName;
-        const groupDescription = req.body.groupDescription;
-        
+const groupName = req.body.groupName;
+    const groupDescription = req.body.groupDescription;
+    const uppercaseTitle = req.body.uppercaseTitle;
+    const lowercaseTitle = req.body.lowercaseTitle;
+    const numericTitle = req.body.numericTitle;       
         if(!req.session.user) return res.status(400).render('error', { error: "Must be logged in" });
         const groupLeader = req.session.user._id;
         try {
             helpers.validateGroup(groupName, groupDescription, groupLeader)
-            const createResult = await groupsData.create(groupName, groupDescription, groupLeader);     
+const createResult = await groupsData.create(groupName, groupDescription, groupLeader, uppercaseTitle, lowercaseTitle, numericTitle);                 
             res.redirect(`groups/${createResult._id}`);
         } catch (err) {
             return res.status(400).render('error', { title: 'Error', error: err });
