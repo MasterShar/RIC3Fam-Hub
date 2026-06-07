@@ -47,9 +47,18 @@ let members = await usersData.getIDName(players);
 
 // Separate the members into 3 distinct buckets based on their starting letters
 // Separate the members into 3 distinct buckets based on character rules
+// Separate the members based on what their username starts with
+// Separate the members based on character rules
+    // 1. MUST be all letters AND entirely uppercase (e.g., TEST, PRICETAG)
     const uppercaseMembers = members.filter(m => m.name && /^[A-Z]+$/.test(m.name));
-    const lowercaseMembers = members.filter(m => m.name && /^[a-z]+$/.test(m.name));
-    const numericMembers = members.filter(m => m.name && /^[0-9]/.test(m.name));
+
+    // 2. Contains numbers/digits anywhere or starts with a digit (e.g., 1firsttest)
+    const numericMembers = members.filter(m => m.name && /[0-9]/.test(m.name));
+
+    // 3. Anyone else who didn't fit the strict all-caps or numeric buckets (e.g., Alice, Wilkin Lai)
+    const lowercaseMembers = members.filter(m => {
+        return !uppercaseMembers.includes(m) && !numericMembers.includes(m);
+    });
 
 // Sort each bucket alphabetically so they look nice and organized
 uppercaseMembers.sort((a, b) => a.name.localeCompare(b.name));
