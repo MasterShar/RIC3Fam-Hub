@@ -46,9 +46,10 @@ router.route('/:groupId').get(async (req, res) => {
 let members = await usersData.getIDName(players);
 
 // Separate the members into 3 distinct buckets based on their starting letters
-const uppercaseMembers = members.filter(m => m.name && /^[A-Z]/.test(m.name));
-const lowercaseMembers = members.filter(m => m.name && /^[a-z]/.test(m.name));
-const numericMembers   = members.filter(m => m.name && /^[0-9]/.test(m.name));
+// Separate the members into 3 distinct buckets based on character rules
+    const uppercaseMembers = members.filter(m => m.name && /^[A-Z]+$/.test(m.name));
+    const lowercaseMembers = members.filter(m => m.name && /^[a-z]+$/.test(m.name));
+    const numericMembers = members.filter(m => m.name && /^[0-9]/.test(m.name));
 
 // Sort each bucket alphabetically so they look nice and organized
 uppercaseMembers.sort((a, b) => a.name.localeCompare(b.name));
