@@ -40,8 +40,18 @@ router.route('/:groupId').get(async (req, res) => {
         const groupObj = await groupsData.get(groupId);
         let players=  groupObj.players;
         players = players.filter(player => player !== groupObj.groupLeader)
-        let members = await usersData.getIDName(players);
-        members.sort((a, b) => stringsAllCaps(a.name, b.name) || a.name.localeCompare(b.name));
+       // Get the list of group members from the database
+let members = await usersData.getIDName(players);
+
+// Separate the members into 3 distinct buckets based on their starting letters
+const uppercaseMembers = members.filter(m => m.name && /^[A-Z]/.test(m.name));
+const lowercaseMembers = members.filter(m => m.name && /^[a-z]/.test(m.name));
+const numericMembers   = members.filter(m => m.name && /^[0-9]/.test(m.name));
+
+// Sort each bucket alphabetically so they look nice and organized
+uppercaseMembers.sort((a, b) => a.name.localeCompare(b.name));
+lowercaseMembers.sort((a, b) => a.name.localeCompare(b.name));
+numericMembers.sort((a, b) => a.name.localeCompare(b.name));
         let games = await gamesData.getAllByGroup(groupId);
         games = games.map(game => ({_id: game._id, name: game.gameName}));
         let owner = null;
@@ -65,14 +75,20 @@ router.route('/:groupId').get(async (req, res) => {
         });
         
         return res.render('group', {
-            title:"Group: " + groupObj.groupName,
-            group: groupObj,
-            members: members,
-            games: games,
-            owner: owner,
-            isMember: isMember,
-            isOwner: isOwner
-        });
+        title: "Group: " + groupObj.groupName,
+        group: groupObj,
+        members: members,
+        uppercaseMembers: uppercaseMembers,
+        uppercaseTitle: groupObj.uppercaseTitle || "All Caps Members",
+        lowercaseMembers: lowercaseMembers,
+        lowercaseTitle: groupObj.lowercaseTitle || "Lowercase Members",
+        numericMembers: numericMembers,
+        numericTitle: groupObj.numericTitle || "Numbered Members",
+        games: games,
+        owner: owner,
+        isMember: isMember,
+        isOwner: isOwner
+      });
     } catch (e) {
         return res.status(400).render('error', { title: 'Error', error: e });
     }
