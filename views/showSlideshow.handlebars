@@ -1,13 +1,6 @@
 {{#if slideshowImages.length}}
 <div class="gallery-wrapper">
-    <div class="gallery-controls">
-        <span class="gallery-controls-label">Pictures per row:</span>
-        <button type="button" class="gallery-col-button" data-cols="1">1</button>
-        <button type="button" class="gallery-col-button" data-cols="2">2</button>
-        <button type="button" class="gallery-col-button" data-cols="3">3</button>
-    </div>
-
-    <div class="gallery-grid" id="gallery-grid">
+    <div class="gallery-grid">
         {{#each slideshowImages}}
             <figure class="gallery-item">
                 <img src="{{this}}" class="gallery-image" alt="Gallery image" loading="lazy">

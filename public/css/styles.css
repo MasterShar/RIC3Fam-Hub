@@ -287,43 +287,14 @@ footer {
 /* PHOTO GALLERY STUFF */
 
 .gallery-wrapper {
-  width: 90%;
-  margin: 0 auto 20px auto;
-}
-
-.gallery-controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 10px 0;
-}
-
-.gallery-controls-label {
-  font-weight: bold;
-  color: #159dd8;
-}
-
-.gallery-col-button {
-  min-width: 40px;
-  padding: 6px 12px;
-  cursor: pointer;
-  border: 1px solid #0c9dd6;
-  background-color: white;
-  color: #159dd8;
-  border-radius: 5px;
-}
-
-.gallery-col-button.is-active {
-  background-color: #2bb891;
-  color: white;
-  border-color: #2bb891;
+  width: 100%;
+  margin: 0 0 20px 0;
 }
 
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(var(--gallery-cols, 3), 1fr);
+  /* Fill the full screen width with as many pictures per row as fit. */
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   align-items: start;
   gap: 10px;
 }
