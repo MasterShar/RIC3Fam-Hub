@@ -630,3 +630,19 @@ p.index {
   font-size: 8pt;
 }
 /* END MISC. */
+
+/* ===== REUSABLE SPACING UTILITIES ===== */
+/* Small, composable helpers so page-specific spacing tweaks live in CSS
+   instead of inline style="" attributes. Extend the scale as needed
+   (e.g. .mt-10, .mb-20) to keep markup free of inline styles. */
+.mt-5 {
+  margin-top: 5px;
+}
+.mb-5 {
+  margin-bottom: 5px;
+}
+.my-5 {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+/* ===== END UTILITIES ===== */
